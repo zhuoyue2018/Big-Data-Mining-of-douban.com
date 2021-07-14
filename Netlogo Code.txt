@@ -1,0 +1,86 @@
+globals [ mylist pre-sum sum-list tick-list]
+
+patches-own
+[
+  vote
+  total
+]
+
+turtles-own [change-number  previous-color]
+
+to setup
+  clear-all
+  ask patches [
+    sprout 1  [
+      set size 0.1
+      set change-number 0
+      set color [pcolor] of patch-here ]
+
+    ifelse random 100 < initial-green-pct
+      [ set vote 0 ]
+      [ set vote 1 ]
+  ]
+  recolor-patch
+  set mylist  [change-number ] of turtles
+  reset-ticks
+end
+
+to go
+
+  set  pre-sum sum mylist  
+  ask patches [
+    set total (sum [ vote ] of neighbors)
+  ]
+  ask turtles [set previous-color color]
+  ask patches [
+    if ticks = 1
+    [if total > 5  [ if random-float 8 > 2.5 [set vote (1 - vote)]]
+    ]
+    if ticks > 1 and  ticks <= 3 [
+      if total >= 1  [ if random-float 8 > 3.3 [set vote 1]   ]]
+    if ticks > 3 and ticks < 5[
+      if total >= 4 [if random-float 8 > 6.55 [set vote (1 - vote)]]
+      if total < 4 [if random-float 8 > 6.55 [set vote 0]]
+  ]
+    if ticks  >= 5 and ticks < 11 [
+      if total >= 4 [if  random-float 8 > 7 [set vote (1 - vote)]]
+      if total < 4 [if random-float 8 > 6.3 [set vote 1]]
+    ]
+    if ticks >= 11 and ticks <= 12[
+    if total > 4 [if random-float 8 > 6.2 [set vote (1 - vote)] ]
+    ]
+    if ticks > 12 and ticks < 17 [
+      if total > 5 [if random-float 8 > 7.42 [set vote (1 - vote)]]
+      if total < 5 [if random-float 8 > 7.55 [set vote 0]]
+    ]
+    if ticks >= 17 and ticks <= 21 [
+    if total > 6 [if random-float 8 > 7.22 [set vote (1 - vote)]]
+      if total < 3  [if random-float 8 > 6.6  [set vote 1 ]]
+    ]
+    if ticks > 21 and ticks <= 22[
+      if total > 4  [if random-float  8 > 5.5 [set vote 1 ]]
+      if total < 2  [if random-float  8 > 6.5 [set vote(1 - vote)]]
+    ]
+    if ticks >= 23 and ticks <= 28[
+     if total > 6 [if random-float 8 > ((ticks mod 2) + 6.42 + random-float 0.825)[set vote (1 - vote)]]
+    ]
+    if ticks >= 29[
+    if total > 6 [if random-float 8 > 7.8 [set vote (1 - vote)]]
+    ]
+  ]
+  recolor-patch
+  ask turtles [if previous-color != color [set change-number (change-number + 1)] ]
+  set mylist  [change-number ] of turtles 
+  tick
+
+  set sum-list sum mylist 
+  set tick-list  (sum-list - pre-sum )
+  if ticks > 30 and tick-list < 10 [ stop ]
+end
+
+to recolor-patch  
+ ask patches[ ifelse vote = 0
+    [ set pcolor green ]
+    [ set pcolor blue ] ]
+  ask turtles [set color [pcolor] of patch-here  ]
+end
